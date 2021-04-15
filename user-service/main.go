@@ -7,16 +7,19 @@ import (
 	"go-playground/proto/user"
 	"go-playground/user-service/handler"
 	"log"
+	"time"
 )
 
 func main() {
-	consulRegistry := consul.NewRegistry(
-		registry.Addrs("39.102.51.46:8500"),
+	consulReg := consul.NewRegistry(
+		registry.Addrs("127.0.0.1:8500"),
 	)
 
 	service := micro.NewService(
 		micro.Name("go.micro.coven.user"),
-		micro.Registry(consulRegistry),
+		micro.Registry(consulReg),
+		micro.RegisterTTL(time.Second*10),
+		micro.RegisterInterval(time.Second*5),
 	)
 
 	service.Init()

@@ -19,5 +19,5 @@ func (h handler) FindUser(ctx context.Context, request *user.FindUserRequest, re
 }
 
 func Handler() user.UserHandler {
-	return handler{}
+	return new(handler)
 }
