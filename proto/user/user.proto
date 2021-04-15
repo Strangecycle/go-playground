@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "proto/user";
+
+message AddUserRequest {
+  string phone = 1;
+}
+
+message FindUserRequest {
+  string id = 1;
+}
+
+message AddUserResponse {
+  string message = 1;
+}
+
+message FindUserResponse {
+  string id = 1;
+  string name = 2;
+  string phone = 3;
+  string email = 4;
+}
+
+service User {
+  rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
+  rpc FindUser(FindUserRequest) returns (FindUserResponse) {}
+}

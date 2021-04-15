@@ -1,0 +1,5 @@
+Protobuf 版本巨坑
+    使用目前最新 Protobuf v3.15.8 时，生成的 go 文件不再默认引入 go-micro/v2 下的东西，而是直接引入 go-micro，
+    然而就导致会依赖到 go-micro v1.8 版本，而这个版本的 service.Server() 方法又不兼容，所以导致这成为了一个巨坑。
+    解决方案：
+        生成 *.pb.micro.go 之后手动将其 import 的 go-micro 改成 go-micro/v2 即可。
