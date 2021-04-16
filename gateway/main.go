@@ -2,21 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-playground/gateway/handler"
+	"go-playground/gateway/router"
 	"log"
 )
 
 func main() {
 	r := gin.Default()
-
-	// Register client service and get controller
-	apiHandler := handler.GetAPIHandler()
-
-	userGroup := r.Group("/user")
-	{
-		userGroup.GET("/", apiHandler.AddUser)
-	}
-
+	router.CollectRoutes(r)
 	if err := r.Run(); err != nil {
 		log.Fatal(err.Error())
 	}
