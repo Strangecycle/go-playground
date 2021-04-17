@@ -9,6 +9,7 @@ func CreateUserRouter(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	{
 		userHandler := handler.GetUserHandler()
-		userGroup.GET("/", userHandler.AddUser)
+		userGroup.GET("/send", userHandler.Send)
+		userGroup.POST("/login", userHandler.Login)
 	}
 }

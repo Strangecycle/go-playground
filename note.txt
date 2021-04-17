@@ -1,3 +1,6 @@
+编译 proto 命令
+    protoc --proto_path=. --micro_out=. --go_out=. ./xx/xx/xx.proto
+
 Protobuf 版本巨坑
     使用目前最新 Protobuf v3.15.8 时，生成的 go 文件不再默认引入 go-micro/v2 下的东西，而是直接引入 go-micro，
     然而就导致会依赖到 go-micro v1.8 版本，而这个版本的 service.Server() 方法又不兼容，所以导致这成为了一个巨坑。

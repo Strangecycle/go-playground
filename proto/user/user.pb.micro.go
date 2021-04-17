@@ -11,6 +11,7 @@ import (
 
 import (
 	context "context"
+	api "github.com/micro/go-micro/v2/api"
 	client "github.com/micro/go-micro/v2/client"
 	server "github.com/micro/go-micro/v2/server"
 )
@@ -27,15 +28,22 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Reference imports to suppress errors if they are not otherwise used.
+var _ api.Endpoint
 var _ context.Context
 var _ client.Option
 var _ server.Option
 
+// Api Endpoints for User service
+
+func NewUserEndpoints() []*api.Endpoint {
+	return []*api.Endpoint{}
+}
+
 // Client API for User service
 
 type UserService interface {
-	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
-	FindUser(ctx context.Context, in *FindUserRequest, opts ...client.CallOption) (*FindUserResponse, error)
+	SendCaptcha(ctx context.Context, in *CaptchaRequest, opts ...client.CallOption) (*CaptchaResponse, error)
+	UserLogin(ctx context.Context, in *UserLoginRequest, opts ...client.CallOption) (*UserLoginResponse, error)
 }
 
 type userService struct {
@@ -44,21 +52,15 @@ type userService struct {
 }
 
 func NewUserService(name string, c client.Client) UserService {
-	if c == nil {
-		c = client.NewClient()
-	}
-	if len(name) == 0 {
-		name = "user"
-	}
 	return &userService{
 		c:    c,
 		name: name,
 	}
 }
 
-func (c *userService) AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error) {
-	req := c.c.NewRequest(c.name, "User.AddUser", in)
-	out := new(AddUserResponse)
+func (c *userService) SendCaptcha(ctx context.Context, in *CaptchaRequest, opts ...client.CallOption) (*CaptchaResponse, error) {
+	req := c.c.NewRequest(c.name, "User.SendCaptcha", in)
+	out := new(CaptchaResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -66,9 +68,9 @@ func (c *userService) AddUser(ctx context.Context, in *AddUserRequest, opts ...c
 	return out, nil
 }
 
-func (c *userService) FindUser(ctx context.Context, in *FindUserRequest, opts ...client.CallOption) (*FindUserResponse, error) {
-	req := c.c.NewRequest(c.name, "User.FindUser", in)
-	out := new(FindUserResponse)
+func (c *userService) UserLogin(ctx context.Context, in *UserLoginRequest, opts ...client.CallOption) (*UserLoginResponse, error) {
+	req := c.c.NewRequest(c.name, "User.UserLogin", in)
+	out := new(UserLoginResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -79,14 +81,14 @@ func (c *userService) FindUser(ctx context.Context, in *FindUserRequest, opts ..
 // Server API for User service
 
 type UserHandler interface {
-	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
-	FindUser(context.Context, *FindUserRequest, *FindUserResponse) error
+	SendCaptcha(context.Context, *CaptchaRequest, *CaptchaResponse) error
+	UserLogin(context.Context, *UserLoginRequest, *UserLoginResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
-		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
-		FindUser(ctx context.Context, in *FindUserRequest, out *FindUserResponse) error
+		SendCaptcha(ctx context.Context, in *CaptchaRequest, out *CaptchaResponse) error
+		UserLogin(ctx context.Context, in *UserLoginRequest, out *UserLoginResponse) error
 	}
 	type User struct {
 		user
@@ -99,10 +101,10 @@ type userHandler struct {
 	UserHandler
 }
 
-func (h *userHandler) AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error {
-	return h.UserHandler.AddUser(ctx, in, out)
+func (h *userHandler) SendCaptcha(ctx context.Context, in *CaptchaRequest, out *CaptchaResponse) error {
+	return h.UserHandler.SendCaptcha(ctx, in, out)
 }
 
-func (h *userHandler) FindUser(ctx context.Context, in *FindUserRequest, out *FindUserResponse) error {
-	return h.UserHandler.FindUser(ctx, in, out)
+func (h *userHandler) UserLogin(ctx context.Context, in *UserLoginRequest, out *UserLoginResponse) error {
+	return h.UserHandler.UserLogin(ctx, in, out)
 }

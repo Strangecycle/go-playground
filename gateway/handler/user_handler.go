@@ -3,12 +3,10 @@ package handler
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	client "github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/util/log"
+	"github.com/micro/go-micro/v2/logger"
 	c "go-playground/gateway/client"
+	"go-playground/gateway/response"
 	"go-playground/proto/user"
-	"net/http"
-	"time"
 )
 
 /*
@@ -24,7 +22,8 @@ import (
 */
 
 type IUserHandler interface {
-	AddUser(ctx *gin.Context)
+	Send(ctx *gin.Context)
+	Login(ctx *gin.Context)
 }
 
 type UserHandler struct {
@@ -37,22 +36,38 @@ func GetUserHandler() IUserHandler {
 	}
 }
 
-func (uh UserHandler) AddUser(ctx *gin.Context) {
-	request := user.AddUserRequest{
-		Phone: "18100751803",
-	}
-	response, err := uh.userClient.AddUser(context.Background(), &request, func(options *client.CallOptions) {
-		// 设置调用服务超时时间，默认 5s
-		// 如果超时会报 408 Request Timeout 错误
-		options.RequestTimeout = time.Second * 30
-		options.DialTimeout = time.Second * 30
-	})
+func (uh UserHandler) Send(ctx *gin.Context) {
+	var request user.CaptchaRequest
+	captcha, err := uh.userClient.SendCaptcha(context.Background(), &request)
 	if err != nil {
-		log.Info(err)
+		logger.Info(err.Error())
+		response.ServerError(ctx)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"code":    0,
-		"message": response.GetMessage(),
-	})
+	response.Success(ctx, captcha.GetCaptcha())
+}
+
+func (uh UserHandler) Login(ctx *gin.Context) {
+	request := user.UserLoginRequest{}
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		logger.Info(err.Error())
+		response.Fail(ctx)
+		return
+	}
+
+	loginResponse, err := uh.userClient.UserLogin(context.Background(), &request)
+	if err != nil {
+		logger.Info(err.Error())
+		response.ServerError(ctx)
+		return
+	}
+
+	// 验证码错误
+	if loginResponse.GetToken() == "" {
+		response.Fail(ctx)
+		return
+	}
+
+	response.Success(ctx, loginResponse.GetToken())
 }

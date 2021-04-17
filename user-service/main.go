@@ -4,6 +4,7 @@ import (
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/micro/go-plugins/registry/consul/v2"
+	"go-playground/config"
 	"go-playground/proto/user"
 	"go-playground/user-service/handler"
 	"log"
@@ -12,7 +13,7 @@ import (
 
 func main() {
 	consulReg := consul.NewRegistry(
-		registry.Addrs("127.0.0.1:8500"),
+		registry.Addrs(config.REGISTRY),
 	)
 
 	service := micro.NewService(

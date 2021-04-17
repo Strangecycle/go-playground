@@ -4,26 +4,22 @@ package user;
 
 option go_package = "proto/user";
 
-message AddUserRequest {
+message CaptchaRequest {}
+
+message CaptchaResponse {
+  string captcha = 1;
+}
+
+message UserLoginRequest {
   string phone = 1;
+  string captcha = 2;
 }
 
-message FindUserRequest {
-  string id = 1;
-}
-
-message AddUserResponse {
-  string message = 1;
-}
-
-message FindUserResponse {
-  string id = 1;
-  string name = 2;
-  string phone = 3;
-  string email = 4;
+message UserLoginResponse {
+  string token = 1;
 }
 
 service User {
-  rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
-  rpc FindUser(FindUserRequest) returns (FindUserResponse) {}
+  rpc SendCaptcha(CaptchaRequest) returns (CaptchaResponse) {}
+  rpc UserLogin(UserLoginRequest) returns (UserLoginResponse) {}
 }
