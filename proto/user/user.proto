@@ -19,7 +19,24 @@ message UserLoginResponse {
   string token = 1;
 }
 
+message UserInfoRequest {
+  string phone = 1;
+  string email = 2;
+}
+
+message UserInfoResponse {
+  uint64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string phone = 4;
+  string email = 5;
+  string sentence = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+}
+
 service User {
   rpc SendCaptcha(CaptchaRequest) returns (CaptchaResponse) {}
   rpc UserLogin(UserLoginRequest) returns (UserLoginResponse) {}
+  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {}
 }

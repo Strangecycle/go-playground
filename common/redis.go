@@ -21,3 +21,7 @@ func init() {
 func GetRedisPool() *redis.Pool {
 	return pool
 }
+
+func GetRedisConnect() redis.Conn {
+	return GetRedisPool().Get()
+}

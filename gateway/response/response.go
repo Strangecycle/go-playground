@@ -29,3 +29,8 @@ func Fail(ctx *gin.Context) {
 func ServerError(ctx *gin.Context) {
 	Format(ctx, http.StatusInternalServerError, http.StatusInternalServerError, nil, "server error")
 }
+
+// Unauthorized 表示未登录
+func Unauthorized(ctx *gin.Context) {
+	Format(ctx, http.StatusUnauthorized, http.StatusUnauthorized, nil, "unauthorized")
+}

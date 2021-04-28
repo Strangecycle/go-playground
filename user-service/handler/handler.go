@@ -15,7 +15,12 @@ func (h handler) SendCaptcha(ctx context.Context, request *user.CaptchaRequest, 
 }
 
 func (h handler) UserLogin(ctx context.Context, request *user.UserLoginRequest, response *user.UserLoginResponse) error {
-	*response = service.UserLogin(request.Phone, request.Captcha)
+	*response = service.UserLogin(request.GetPhone(), request.GetCaptcha())
+	return nil
+}
+
+func (h handler) UserInfo(ctx context.Context, request *user.UserInfoRequest, response *user.UserInfoResponse) error {
+	*response = service.UserInfo(request.GetPhone(), request.GetEmail())
 	return nil
 }
 

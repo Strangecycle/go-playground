@@ -9,9 +9,10 @@ import (
 	"go-playground/util"
 )
 
+// SendCaptcha
 func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 	// TODO 将验证码存进 redis 为登录时做验证
-	conn := common.GetRedisPool().Get()
+	conn := common.GetRedisConnect()
 	defer conn.Close()
 
 	captcha := util.GenCaptcha()
@@ -23,13 +24,14 @@ func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 	}
 }
 
+// UserLogin
 func UserLogin(phone string, captcha string) user.UserLoginResponse {
 	response := user.UserLoginResponse{Token: ""}
 	if phone == "" || captcha == "" {
 		return response
 	}
 
-	conn := common.GetRedisPool().Get()
+	conn := common.GetRedisConnect()
 	defer conn.Close()
 
 	// 对比验证码
@@ -40,13 +42,13 @@ func UserLogin(phone string, captcha string) user.UserLoginResponse {
 
 	db := common.GetDB()
 	userModel := &model.User{
-		Username: phone, // 默认用户名为手机号
+		Username: "", // 默认用户名为手机号
 		Phone:    phone,
 		Avatar:   "",
 		Email:    "",
 		Sentence: "",
 	}
-	db.Where("phone = ?", phone).Find(&userModel)
+	db.Where("phone = ?", phone).First(&userModel)
 	// 如果用户不存在则创建用户
 	if userModel.ID == 0 {
 		if err := db.Create(&userModel).Error; err != nil {
@@ -60,4 +62,32 @@ func UserLogin(phone string, captcha string) user.UserLoginResponse {
 	conn.Do("Del", "captcha")
 
 	return response
+}
+
+// UserInfo
+func UserInfo(phone string, email string) user.UserInfoResponse {
+	db := common.GetDB()
+	userModel := &model.User{}
+
+	if phone != "" {
+		db.Where("phone = ?", phone).First(&userModel)
+	}
+	if email != "" {
+		db.Where("email = ?", email).First(&userModel)
+	}
+
+	if userModel.ID == 0 {
+		return user.UserInfoResponse{}
+	}
+
+	return user.UserInfoResponse{
+		Id:        uint64(userModel.ID),
+		Username:  userModel.Username,
+		Avatar:    userModel.Avatar,
+		Phone:     userModel.Phone,
+		Email:     userModel.Email,
+		Sentence:  userModel.Sentence,
+		CreatedAt: userModel.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: userModel.UpdatedAt.Format("2006-01-02 15:04:05"),
+	}
 }

@@ -44,6 +44,7 @@ func NewUserEndpoints() []*api.Endpoint {
 type UserService interface {
 	SendCaptcha(ctx context.Context, in *CaptchaRequest, opts ...client.CallOption) (*CaptchaResponse, error)
 	UserLogin(ctx context.Context, in *UserLoginRequest, opts ...client.CallOption) (*UserLoginResponse, error)
+	UserInfo(ctx context.Context, in *UserInfoRequest, opts ...client.CallOption) (*UserInfoResponse, error)
 }
 
 type userService struct {
@@ -78,17 +79,29 @@ func (c *userService) UserLogin(ctx context.Context, in *UserLoginRequest, opts 
 	return out, nil
 }
 
+func (c *userService) UserInfo(ctx context.Context, in *UserInfoRequest, opts ...client.CallOption) (*UserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "User.UserInfo", in)
+	out := new(UserInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
 	SendCaptcha(context.Context, *CaptchaRequest, *CaptchaResponse) error
 	UserLogin(context.Context, *UserLoginRequest, *UserLoginResponse) error
+	UserInfo(context.Context, *UserInfoRequest, *UserInfoResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
 		SendCaptcha(ctx context.Context, in *CaptchaRequest, out *CaptchaResponse) error
 		UserLogin(ctx context.Context, in *UserLoginRequest, out *UserLoginResponse) error
+		UserInfo(ctx context.Context, in *UserInfoRequest, out *UserInfoResponse) error
 	}
 	type User struct {
 		user
@@ -107,4 +120,8 @@ func (h *userHandler) SendCaptcha(ctx context.Context, in *CaptchaRequest, out *
 
 func (h *userHandler) UserLogin(ctx context.Context, in *UserLoginRequest, out *UserLoginResponse) error {
 	return h.UserHandler.UserLogin(ctx, in, out)
+}
+
+func (h *userHandler) UserInfo(ctx context.Context, in *UserInfoRequest, out *UserInfoResponse) error {
+	return h.UserHandler.UserInfo(ctx, in, out)
 }
