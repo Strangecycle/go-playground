@@ -16,6 +16,10 @@ func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 	defer conn.Close()
 
 	captcha := util.GenCaptcha()
+
+	// TODO 给用户发送短信验证码
+	go func() {}()
+
 	conn.Do("Set", "captcha", captcha)
 	conn.Do("expire", "captcha", 120) // 120 秒后过期
 
@@ -27,6 +31,7 @@ func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 // UserLogin
 func UserLogin(phone string, captcha string) user.UserLoginResponse {
 	response := user.UserLoginResponse{Token: ""}
+	// 为了服务健壮性，在这里也验证一下参数
 	if phone == "" || captcha == "" {
 		return response
 	}
@@ -67,7 +72,7 @@ func UserLogin(phone string, captcha string) user.UserLoginResponse {
 // UserInfo
 func UserInfo(phone string, email string) user.UserInfoResponse {
 	db := common.GetDB()
-	userModel := &model.User{}
+	var userModel *model.User
 
 	if phone != "" {
 		db.Where("phone = ?", phone).First(&userModel)
@@ -90,4 +95,24 @@ func UserInfo(phone string, email string) user.UserInfoResponse {
 		CreatedAt: userModel.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: userModel.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
+}
+
+// UserEdit
+func UserEdit(request *user.UserEditRequest) user.UserEditResponse {
+	var userModel *model.User
+	db := common.GetDB()
+
+	result := db.Model(&userModel).Where("id = ?", request.GetId()).Updates(model.User{
+		Username: request.GetUsername(),
+		Avatar:   request.GetAvatar(),
+		Phone:    request.GetPhone(),
+		Email:    request.GetEmail(),
+		Sentence: request.GetSentence(),
+	})
+
+	if result.Error != nil {
+		logger.Info(result.Error.Error())
+	}
+
+	return user.UserEditResponse{AffectedRow: result.RowsAffected}
 }

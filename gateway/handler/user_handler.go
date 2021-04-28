@@ -6,8 +6,10 @@ import (
 	"github.com/micro/go-micro/v2/logger"
 	c "go-playground/gateway/client"
 	"go-playground/gateway/response"
+	"go-playground/gateway/vo"
 	"go-playground/proto/user"
 	"go-playground/user-service/model"
+	"strconv"
 )
 
 /*
@@ -26,6 +28,7 @@ type IUserHandler interface {
 	Send(ctx *gin.Context)
 	Login(ctx *gin.Context)
 	Info(ctx *gin.Context)
+	Edit(ctx *gin.Context)
 }
 
 type UserHandler struct {
@@ -52,15 +55,21 @@ func (uh UserHandler) Send(ctx *gin.Context) {
 
 // Login
 func (uh UserHandler) Login(ctx *gin.Context) {
-	request := user.UserLoginRequest{}
-	err := ctx.ShouldBindJSON(&request)
+	// 使用 VO 层对参数进行 ShouldBind 验证
+	var loginRequestVO vo.UserLoginRequestVO
+	err := ctx.ShouldBindJSON(&loginRequestVO)
 	if err != nil {
 		logger.Info(err.Error())
 		response.Fail(ctx)
 		return
 	}
 
-	loginResponse, err := uh.userClient.UserLogin(context.Background(), &request)
+	loginRequest := user.UserLoginRequest{
+		Phone:   loginRequestVO.Phone,
+		Captcha: loginRequestVO.Captcha,
+	}
+
+	loginResponse, err := uh.userClient.UserLogin(context.Background(), &loginRequest)
 	// 服务错误
 	if err != nil {
 		logger.Info(err.Error())
@@ -98,18 +107,39 @@ func (uh UserHandler) Info(ctx *gin.Context) {
 			UpdatedAt: currentUser.UpdatedAt.Format("2006-01-02 15:04:05"),
 		})
 		return
-	} else {
-		// 传了手机号或邮箱，通过它们来查找用户
-		request.Phone = phone
-		request.Email = email
 	}
+
+	// 传了手机号或邮箱，通过它们来查找用户
+	request.Phone = phone
+	request.Email = email
 
 	infoResponse, err := uh.userClient.UserInfo(context.Background(), &request)
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		response.ServerError(ctx)
 		return
 	}
 
 	response.Success(ctx, infoResponse)
+}
+
+// Edit
+func (uh UserHandler) Edit(ctx *gin.Context) {
+	userID, _ := strconv.ParseUint(ctx.Params.ByName("id"), 10, 64)
+	editRequest := user.UserEditRequest{Id: userID}
+	err := ctx.ShouldBindJSON(&editRequest)
+	if err != nil {
+		logger.Error(err.Error())
+		response.Fail(ctx)
+		return
+	}
+
+	editResponse, err := uh.userClient.UserEdit(context.Background(), &editRequest)
+	if err != nil {
+		logger.Error(err.Error())
+		response.ServerError(ctx)
+		return
+	}
+
+	response.Success(ctx, editResponse.AffectedRow)
 }
