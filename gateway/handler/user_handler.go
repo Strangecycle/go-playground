@@ -43,7 +43,12 @@ func GetUserHandler() IUserHandler {
 
 // Send
 func (uh UserHandler) Send(ctx *gin.Context) {
-	var request user.CaptchaRequest
+	phone := ctx.Query("phone")
+	if len(phone) != 11 {
+		response.Fail(ctx)
+		return
+	}
+	request := user.CaptchaRequest{Phone: phone}
 	captcha, err := uh.userClient.SendCaptcha(context.Background(), &request)
 	if err != nil {
 		logger.Info(err.Error())

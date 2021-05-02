@@ -4,7 +4,9 @@ package user;
 
 option go_package = "proto/user";
 
-message CaptchaRequest {}
+message CaptchaRequest {
+  string phone = 1;
+}
 
 message CaptchaResponse {
   string captcha = 1;

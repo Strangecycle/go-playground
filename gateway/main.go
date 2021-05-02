@@ -9,6 +9,7 @@ import (
 
 func main() {
 	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20
 	router.CollectRoutes(r)
 	if err := r.Run(":" + config.GATEWAY); err != nil {
 		log.Fatal(err.Error())

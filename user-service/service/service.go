@@ -11,7 +11,11 @@ import (
 
 // SendCaptcha
 func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
-	// TODO 将验证码存进 redis 为登录时做验证
+	// TODO request 接收一个手机号
+	if request.GetPhone() == "" {
+		return user.CaptchaResponse{Captcha: ""}
+	}
+
 	conn := common.GetRedisConnect()
 	defer conn.Close()
 
@@ -20,6 +24,7 @@ func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 	// TODO 给用户发送短信验证码
 	go func() {}()
 
+	// 存入 redis
 	conn.Do("Set", "captcha", captcha)
 	conn.Do("expire", "captcha", 120) // 120 秒后过期
 
