@@ -45,6 +45,7 @@ type UserService interface {
 	SendCaptcha(ctx context.Context, in *CaptchaRequest, opts ...client.CallOption) (*CaptchaResponse, error)
 	UserLogin(ctx context.Context, in *UserLoginRequest, opts ...client.CallOption) (*UserLoginResponse, error)
 	UserInfo(ctx context.Context, in *UserInfoRequest, opts ...client.CallOption) (*UserInfoResponse, error)
+	UserAvatar(ctx context.Context, in *UserAvatarRequest, opts ...client.CallOption) (*UserAvatarResponse, error)
 	UserEdit(ctx context.Context, in *UserEditRequest, opts ...client.CallOption) (*UserEditResponse, error)
 }
 
@@ -90,6 +91,16 @@ func (c *userService) UserInfo(ctx context.Context, in *UserInfoRequest, opts ..
 	return out, nil
 }
 
+func (c *userService) UserAvatar(ctx context.Context, in *UserAvatarRequest, opts ...client.CallOption) (*UserAvatarResponse, error) {
+	req := c.c.NewRequest(c.name, "User.UserAvatar", in)
+	out := new(UserAvatarResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userService) UserEdit(ctx context.Context, in *UserEditRequest, opts ...client.CallOption) (*UserEditResponse, error) {
 	req := c.c.NewRequest(c.name, "User.UserEdit", in)
 	out := new(UserEditResponse)
@@ -106,6 +117,7 @@ type UserHandler interface {
 	SendCaptcha(context.Context, *CaptchaRequest, *CaptchaResponse) error
 	UserLogin(context.Context, *UserLoginRequest, *UserLoginResponse) error
 	UserInfo(context.Context, *UserInfoRequest, *UserInfoResponse) error
+	UserAvatar(context.Context, *UserAvatarRequest, *UserAvatarResponse) error
 	UserEdit(context.Context, *UserEditRequest, *UserEditResponse) error
 }
 
@@ -114,6 +126,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		SendCaptcha(ctx context.Context, in *CaptchaRequest, out *CaptchaResponse) error
 		UserLogin(ctx context.Context, in *UserLoginRequest, out *UserLoginResponse) error
 		UserInfo(ctx context.Context, in *UserInfoRequest, out *UserInfoResponse) error
+		UserAvatar(ctx context.Context, in *UserAvatarRequest, out *UserAvatarResponse) error
 		UserEdit(ctx context.Context, in *UserEditRequest, out *UserEditResponse) error
 	}
 	type User struct {
@@ -137,6 +150,10 @@ func (h *userHandler) UserLogin(ctx context.Context, in *UserLoginRequest, out *
 
 func (h *userHandler) UserInfo(ctx context.Context, in *UserInfoRequest, out *UserInfoResponse) error {
 	return h.UserHandler.UserInfo(ctx, in, out)
+}
+
+func (h *userHandler) UserAvatar(ctx context.Context, in *UserAvatarRequest, out *UserAvatarResponse) error {
+	return h.UserHandler.UserAvatar(ctx, in, out)
 }
 
 func (h *userHandler) UserEdit(ctx context.Context, in *UserEditRequest, out *UserEditResponse) error {

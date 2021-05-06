@@ -37,6 +37,17 @@ message UserInfoResponse {
   string updatedAt = 8;
 }
 
+message UserAvatarRequest {
+  uint64 userId = 1;
+  string avatarName = 2;
+  bytes avatarBytes = 3;
+}
+
+message UserAvatarResponse {
+  string avatarName = 1;
+  string avatarUrl = 2;
+}
+
 message UserEditRequest {
   uint64 id = 1;
   string username = 2;
@@ -54,5 +65,6 @@ service User {
   rpc SendCaptcha(CaptchaRequest) returns (CaptchaResponse) {}
   rpc UserLogin(UserLoginRequest) returns (UserLoginResponse) {}
   rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {}
+  rpc UserAvatar(UserAvatarRequest) returns (UserAvatarResponse) {}
   rpc UserEdit(UserEditRequest) returns (UserEditResponse) {}
 }

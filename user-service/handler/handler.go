@@ -24,6 +24,11 @@ func (h handler) UserInfo(ctx context.Context, request *user.UserInfoRequest, re
 	return nil
 }
 
+func (h handler) UserAvatar(ctx context.Context, request *user.UserAvatarRequest, response *user.UserAvatarResponse) error {
+	*response = service.UserAvatar(request)
+	return nil
+}
+
 func (h handler) UserEdit(ctx context.Context, request *user.UserEditRequest, response *user.UserEditResponse) error {
 	*response = service.UserEdit(request)
 	return nil

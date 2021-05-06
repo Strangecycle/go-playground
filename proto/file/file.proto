@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package file;
+
+option go_package = "proto/file";
+
+message SingleUploadRequest {
+  bytes file = 1;
+  string filename = 2;
+}
+
+message SingleUploadResponse {
+  string filename = 1;
+  string fileUrl = 2;
+}
+
+service File {
+  rpc SingleUpload(SingleUploadRequest) returns (SingleUploadResponse) {}
+}

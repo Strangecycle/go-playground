@@ -14,5 +14,6 @@ func CreateUserRouter(r *gin.Engine) {
 		userGroup.POST("/login", userHandler.Login)
 		userGroup.GET("/info", middleware.AuthMiddleware(), userHandler.Info)
 		userGroup.PUT(":id", middleware.AuthMiddleware(), userHandler.Edit)
+		userGroup.POST("/avatar", middleware.AuthMiddleware(), userHandler.Avatar)
 	}
 }

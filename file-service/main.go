@@ -6,8 +6,8 @@ import (
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/micro/go-plugins/registry/consul/v2"
 	"go-playground/config"
-	"go-playground/proto/user"
-	"go-playground/user-service/handler"
+	"go-playground/file-service/handler"
+	"go-playground/proto/file"
 	"time"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	)
 
 	service := micro.NewService(
-		micro.Name("go.micro.coven.user"),
+		micro.Name("go.micro.coven.file"),
 		micro.Registry(consulReg),
 		micro.RegisterTTL(time.Second*10),
 		micro.RegisterInterval(time.Second*5),
@@ -25,7 +25,7 @@ func main() {
 
 	service.Init()
 
-	user.RegisterUserHandler(service.Server(), handler.Handler())
+	file.RegisterFileHandler(service.Server(), handler.Handler())
 
 	if err := service.Run(); err != nil {
 		logger.Fatal(err.Error())

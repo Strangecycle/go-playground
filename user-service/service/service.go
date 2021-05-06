@@ -1,10 +1,13 @@
 package service
 
 import (
+	"context"
 	"github.com/gomodule/redigo/redis"
 	"github.com/micro/go-micro/v2/logger"
 	"go-playground/common"
+	"go-playground/proto/file"
 	"go-playground/proto/user"
+	"go-playground/user-service/client"
 	"go-playground/user-service/model"
 	"go-playground/util"
 )
@@ -21,7 +24,7 @@ func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 
 	captcha := util.GenCaptcha()
 
-	// TODO 给用户发送短信验证码
+	// TODO 创建一个短信服务以消息队列（RabbitMQ）的方式给用户发送短信验证码
 	go func() {}()
 
 	// 存入 redis
@@ -100,6 +103,34 @@ func UserInfo(phone string, email string) user.UserInfoResponse {
 		CreatedAt: userModel.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: userModel.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
+}
+
+func UserAvatar(request *user.UserAvatarRequest) user.UserAvatarResponse {
+	// TODO 调用文件服务上传文件
+	fileService := client.GetFileService()
+	requestUpload := file.SingleUploadRequest{
+		File:     request.GetAvatarBytes(),
+		Filename: request.GetAvatarName(),
+	}
+
+	responseUpload, err := fileService.SingleUpload(context.Background(), &requestUpload)
+	if err != nil {
+		logger.Error(err.Error())
+		return user.UserAvatarResponse{}
+	}
+
+	responseAvatar := user.UserAvatarResponse{
+		AvatarName: responseUpload.GetFilename(),
+		AvatarUrl:  responseUpload.GetFileUrl(),
+	}
+
+	// 修改用户 avatar 字段信息
+	db := common.GetDB()
+	if err := db.Model(&model.User{}).Where("id = ?", request.GetUserId()).Update("avatar", responseAvatar.GetAvatarUrl()).Error; err != nil {
+		logger.Error(err.Error())
+	}
+
+	return responseAvatar
 }
 
 // UserEdit

@@ -9,6 +9,7 @@ import (
 	"go-playground/gateway/vo"
 	"go-playground/proto/user"
 	"go-playground/user-service/model"
+	"io/ioutil"
 	"strconv"
 )
 
@@ -28,6 +29,7 @@ type IUserHandler interface {
 	Send(ctx *gin.Context)
 	Login(ctx *gin.Context)
 	Info(ctx *gin.Context)
+	Avatar(ctx *gin.Context)
 	Edit(ctx *gin.Context)
 }
 
@@ -126,6 +128,37 @@ func (uh UserHandler) Info(ctx *gin.Context) {
 	}
 
 	response.Success(ctx, infoResponse)
+}
+
+// Avatar
+func (uh UserHandler) Avatar(ctx *gin.Context) {
+	file, _ := ctx.FormFile("file")
+	openedFile, _ := file.Open()
+	defer openedFile.Close()
+
+	// 将文件转成二进制流发送给用户服务，再由用户服务调用文件服务来完成修改头像业务
+	fileBytes, err := ioutil.ReadAll(openedFile)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	currentUser, _ := ctx.Get("user")
+
+	request := user.UserAvatarRequest{
+		UserId:      uint64(currentUser.(model.User).ID),
+		AvatarName:  file.Filename,
+		AvatarBytes: fileBytes,
+	}
+
+	avatarResponse, err := uh.userClient.UserAvatar(context.Background(), &request)
+	if err != nil {
+		logger.Error(err.Error())
+		response.ServerError(ctx)
+		return
+	}
+
+	response.Success(ctx, avatarResponse)
 }
 
 // Edit
