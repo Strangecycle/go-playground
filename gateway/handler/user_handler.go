@@ -158,6 +158,11 @@ func (uh UserHandler) Avatar(ctx *gin.Context) {
 		return
 	}
 
+	if avatarResponse.GetAvatarUrl() == "" {
+		response.ServerError(ctx)
+		return
+	}
+
 	response.Success(ctx, avatarResponse)
 }
 
