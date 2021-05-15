@@ -6,5 +6,4 @@ const (
 	REGISTRY = "39.102.51.46:8500"
 	SECRET   = "jwt_secret_key"
 	REDIS    = "39.102.51.46:6379"
-	DOMAIN   = "http://localhost:5000"
 )
