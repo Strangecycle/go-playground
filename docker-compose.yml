@@ -5,6 +5,8 @@ services:
     container_name: mysql
     ports:
       - 3306:3306
+    # 这里应该加上 volumes，并把容器内部数据保存到主机，否则每次重启时数据库都会被清空
+    # volumes:
     environment:
       MYSQL_ROOT_PASSWORD: 123456
     logging:
