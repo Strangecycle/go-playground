@@ -106,7 +106,7 @@ func UserInfo(phone string, email string) user.UserInfoResponse {
 }
 
 func UserAvatar(request *user.UserAvatarRequest) user.UserAvatarResponse {
-	// TODO 调用文件服务上传文件
+	// 调用文件服务上传文件
 	fileService := client.GetFileService()
 	requestUpload := file.SingleUploadRequest{
 		File:     request.GetAvatarBytes(),

@@ -1,7 +1,19 @@
 version: "3"
 services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5g"
   nginx:
     image: nginx
+    container_name: nginx
     ports:
       - 80:80
       - 81:81
@@ -11,9 +23,30 @@ services:
       - /work/playground/nginx/log:/var/log/nginx
       - /work/playground/nginx/html:/usr/share/nginx/html
       - /file:/file
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - 8500:8500
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    hostname: myRabbit
+    environment:
+      RABBITMQ_DEFAULT_VHOST: my_vhost
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
   gateway:
-    container_name: playground-gateway
     image: playground-gateway
+    container_name: playground-gateway
     ports:
       - 5000:5000
     restart: always
@@ -24,8 +57,8 @@ services:
       options:
         max-size: "5g"
   user:
-    container_name: playground-user
     image: playground-user
+    container_name: playground-user
     ports:
       - 5001:5001
     restart: always
@@ -36,8 +69,8 @@ services:
       options:
         max-size: "5g"
   file:
-    container_name: playground-file
     image: playground-file
+    container_name: playground-file
     ports:
       - 5002:5002
     restart: always

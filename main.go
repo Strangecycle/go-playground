@@ -1,15 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"go-playground/common"
-	"go-playground/config"
-	"io/ioutil"
-	"log"
-	"os"
-	"path"
-)
-
 // 测试用的入口文件
 func main() {
 	/*f, err := os.Open("user-service/user-service")
@@ -28,7 +18,7 @@ func main() {
 	contentType := http.DetectContentType(buffer)
 	fmt.Println(contentType)*/
 
-	sftpClient, err := common.CreateSftp(
+	/*sftpClient, err := common.CreateSftp(
 		config.SSH_KEY,
 		config.SSH_USER,
 		config.SSH_HOST,
@@ -56,5 +46,5 @@ func main() {
 	defer dstFile.Close()
 
 	dstFile.Write(fileBytes)
-	fmt.Println("文件上传完成")
+	fmt.Println("文件上传完成")*/
 }
