@@ -14,7 +14,6 @@ import (
 
 // SendCaptcha
 func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
-	// TODO request 接收一个手机号
 	if request.GetPhone() == "" {
 		return user.CaptchaResponse{Captcha: ""}
 	}
@@ -28,8 +27,8 @@ func SendCaptcha(request *user.CaptchaRequest) user.CaptchaResponse {
 	go func() {}()
 
 	// 存入 redis
-	conn.Do("Set", "captcha", captcha)
-	conn.Do("expire", "captcha", 120) // 120 秒后过期
+	conn.Do("Set", request.GetPhone(), captcha)
+	conn.Do("expire", request.GetPhone(), 120) // 120 秒后过期
 
 	return user.CaptchaResponse{
 		Captcha: captcha,
@@ -48,14 +47,14 @@ func UserLogin(phone string, captcha string) user.UserLoginResponse {
 	defer conn.Close()
 
 	// 对比验证码
-	code, _ := redis.String(conn.Do("Get", "captcha"))
+	code, _ := redis.String(conn.Do("get", phone))
 	if code != captcha {
 		return response
 	}
 
 	db := common.GetDB()
 	userModel := &model.User{
-		Username: "", // 默认用户名为手机号
+		Username: "",
 		Phone:    phone,
 		Avatar:   "",
 		Email:    "",
@@ -72,7 +71,7 @@ func UserLogin(phone string, captcha string) user.UserLoginResponse {
 	response.Token = common.GenToken(userModel.Username, userModel.ID)
 
 	// 登录成功后验证码失效
-	conn.Do("Del", "captcha")
+	conn.Do("Del", phone)
 
 	return response
 }

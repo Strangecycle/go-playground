@@ -15,9 +15,7 @@ func GetFileService() file.FileService {
 		return fileService
 	}
 
-	consulReg := consul.NewRegistry(
-		registry.Addrs(config.REGISTRY),
-	)
+	consulReg := consul.NewRegistry(registry.Addrs(config.Registry))
 
 	service := micro.NewService(
 		micro.Registry(consulReg),

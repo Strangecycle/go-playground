@@ -11,7 +11,7 @@ import (
 var db *gorm.DB
 
 func init() {
-	open, err := gorm.Open(mysql.New(mysql.Config{DSN: config.DSN}), &gorm.Config{})
+	open, err := gorm.Open(mysql.New(mysql.Config{DSN: config.Dsn}), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Fail to connect database.")
 	}

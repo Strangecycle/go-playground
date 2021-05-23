@@ -27,7 +27,7 @@ func Fail(ctx *gin.Context) {
 
 // ServerError 表示服务调用失败
 func ServerError(ctx *gin.Context) {
-	Format(ctx, http.StatusInternalServerError, http.StatusInternalServerError, nil, "server error")
+	Format(ctx, http.StatusInternalServerError, http.StatusInternalServerError, nil, "consumer error")
 }
 
 // Unauthorized 表示未登录

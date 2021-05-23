@@ -14,7 +14,7 @@ func SingleUpload(request *file.SingleUploadRequest) file.SingleUploadResponse {
 	sftpClient, _ := common.GetSftpClient()
 	defer sftpClient.Close()
 
-	remoteFile, err := sftpClient.Create(path.Join(config.REMOTE_UPLOAD_DIR, request.GetFilename()))
+	remoteFile, err := sftpClient.Create(path.Join(config.RemoteUploadDir, request.GetFilename()))
 	if err != nil {
 		logger.Error(err.Error())
 		return file.SingleUploadResponse{}
@@ -25,7 +25,7 @@ func SingleUpload(request *file.SingleUploadRequest) file.SingleUploadResponse {
 
 	return file.SingleUploadResponse{
 		Filename: request.GetFilename(),
-		FileUrl:  config.FILE_ADDR + request.GetFilename(),
+		FileUrl:  config.FileAddr + request.GetFilename(),
 	}
 
 	// err := ioutil.WriteFile("./upload/"+request.GetFilename(), request.GetFile(), 0666)

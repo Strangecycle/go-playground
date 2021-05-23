@@ -12,9 +12,7 @@ import (
 )
 
 func main() {
-	consulReg := consul.NewRegistry(
-		registry.Addrs(config.REGISTRY),
-	)
+	consulReg := consul.NewRegistry(registry.Addrs(config.Registry))
 
 	service := micro.NewService(
 		micro.Name("go.micro.coven.user"),

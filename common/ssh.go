@@ -39,7 +39,7 @@ func ConnectSSHWithKey(sshKey string, sshUser string, sshHost string, sshPort in
 	addr := fmt.Sprintf("%s:%d", sshHost, sshPort)
 	client, err := ssh.Dial("tcp", addr, sshConfig)
 	if err != nil {
-		fmt.Println("Fail to connect remote server：" + err.Error())
+		fmt.Println("Fail to connect remote consumer：" + err.Error())
 		return nil, err
 	}
 	return client, nil
@@ -49,7 +49,7 @@ func ConnectSSHWithKey(sshKey string, sshUser string, sshHost string, sshPort in
 func CreateSftp(sshKey string, sshUser string, sshHost string, sshPort int) (*sftp.Client, error) {
 	conn, err := ConnectSSHWithKey(sshKey, sshUser, sshHost, sshPort)
 	if err != nil {
-		panic("Fail to connect remote server：" + err.Error())
+		panic("Fail to connect remote consumer：" + err.Error())
 	}
 
 	client, err := sftp.NewClient(conn)
@@ -64,10 +64,10 @@ func CreateSftp(sshKey string, sshUser string, sshHost string, sshPort int) (*sf
 func GetSftpClient() (*sftp.Client, error) {
 	sftpClient, err := CreateSftp(
 		// TODO 为什么在 linux 上只能读当前目录下的文件？？
-		config.SSH_KEY,
-		config.SSH_USER,
-		config.SSH_HOST,
-		config.SSH_PORT,
+		config.SshKey,
+		config.SshUser,
+		config.SshHost,
+		config.SshPort,
 	)
 	if err != nil {
 		panic("Fail to get sftp client：" + err.Error())

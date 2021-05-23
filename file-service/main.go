@@ -13,7 +13,7 @@ import (
 
 func main() {
 	consulReg := consul.NewRegistry(
-		registry.Addrs(config.REGISTRY),
+		registry.Addrs(config.Registry),
 	)
 
 	service := micro.NewService(

@@ -25,7 +25,7 @@ func GenToken(username string, uid uint) string {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(config.SECRET))
+	tokenString, err := token.SignedString([]byte(config.JwtSecret))
 	if err != nil {
 		logger.Info("fail to generate token")
 	}
@@ -37,7 +37,7 @@ func ParseToken(tokenString string) (*jwt.Token, *Claims, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.SECRET), nil
+		return []byte(config.JwtSecret), nil
 	})
 
 	return token, claims, err

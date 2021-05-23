@@ -15,9 +15,7 @@ func GetUserClient() user.UserService {
 		return userClient
 	}
 
-	consulReg := consul.NewRegistry(
-		registry.Addrs(config.REGISTRY),
-	)
+	consulReg := consul.NewRegistry(registry.Addrs(config.Registry))
 
 	service := micro.NewService(
 		micro.Registry(consulReg),
